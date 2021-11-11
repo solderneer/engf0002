@@ -33,6 +33,17 @@ void setup() {
 
   // Initialise the serial communication
   Serial.begin(9600);
+
+  // Startup Sound
+  tone(BUZZER, 330, 200);
+  delay(200);
+  noTone(BUZZER);
+  tone(BUZZER, 262, 200);
+  delay(200);
+  noTone(BUZZER);
+  tone(BUZZER, 330, 200);
+  delay(200);
+  noTone(BUZZER);
 }
 
 void loop() {

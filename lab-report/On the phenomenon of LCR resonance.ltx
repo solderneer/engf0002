@@ -1,0 +1,134 @@
+\documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{a4paper}                   		% ... or a4paper or a5paper or ... 
+%\geometry{landscape}                		% Activate for rotated page geometry
+%\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
+\graphicspath{ {./images/} }
+								% TeX will automatically convert eps --> pdf in pdflatex		
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+%SetFonts
+
+%SetFonts
+
+
+\title{On the phenomenon of series LCR resonance}
+\author{Sundaramahalingam Sudharshan}
+%\date{}							% Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+%\section{}
+%\subsection{}
+
+\section{Introduction}
+\section{Theory}
+Resonance is a phenomenon that occurs in circuits with both capacitive and inductive components. This effect arises due to the fact that capacitive impedance decreases as the frequency increases, as compared to inductive impedance which increases as the frequency increases. Additionally, capacitors have a phase shift of -90$^{\circ}$ while inductors have a phase shift of -90$^{\circ}$. The equations for the impedances of capacitors and inductors are $Z_C$ and $Z_I$ correspondingly, and are shown below.
+
+\begin{equation}
+	\nonumber Z_C = \frac{-j}{\omega C},\ Z_I = j\omega C.
+\end{equation}
+
+Together, the combined effect of a series LCR circuit is that, at some frequency $\omega_0$, the impedances from the capacitor and inductor will cancel each other out, which results in a purely real impedance (from the resistor with resistance $R$) and no phase shift. This frequency is known as the resonance frequency of the circuit.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{LCR Circuit}
+	\caption{Simple LCR Circuit Diagram}
+	\label{fig:lcrcircuit}
+\end{figure}
+
+\subsection{Deriving the resonant frequency}
+Analyzing the simple LCR circuit as shown in Figure \ref{fig:lcrcircuit}, the transfer function can be obtained by treating the circuit as a normal resistive voltage divider, except the resistances are replaced by the equivalent impedances of the reactive components.
+
+\begin{equation}
+	\frac{V_out}{V_in} = \frac{R}{R + j\omega L - \frac{j}{\omega C}}
+	\label{transfer}
+\end{equation}
+
+From which we can see that at the resonance frequency $\omega_0$, 
+\begin{equation}
+	\nonumber j\omega_0 L = \frac{j}{\omega_0 C}\ and \ \bigg |\frac{V_out}{V_in} \bigg| = 1
+\end{equation}
+
+Which means that the resonance frequency $\omega_0$ is,
+\begin{equation}
+	\omega_0 = \frac{1}{\sqrt{LC}}
+	\label{resonance}
+\end{equation}
+
+\subsection{Expected frequency response}
+
+
+\subsection{Deriving the 3dB bandwidth}
+The 3dB bandwidth is obtained from the range of values for which $\big |\frac{V_out}{V_in} \big| = \frac{1}{\sqrt{2}}$. The 3dB bandwidth is an important characteristic as it shows us the range of frequencies for which the signal not attenuated more than half-power. To derive the 3dB bandwidth, we start with Equation (\ref{transfer})
+
+\begin{gather}
+		\nonumber \bigg |\frac{V_out}{V_in} \bigg| = \frac{|R|}{|R + j\omega L - \frac{j}{\omega C}|} = \frac{R}{\sqrt{R^2 + (\omega L - \frac{1}{\omega C})^2}} = \frac{1}{\sqrt{2}} \\ 
+		\nonumber \\
+		\omega_1 = \frac{-R + \sqrt{R^2 + 4L/C}}{2L} \ and \ \omega_2 = \frac{R + \sqrt{R^2 + 4L/C}}{2L}
+\end{gather}
+
+The 3dB bandwidth is then given by,
+\begin{equation}
+	\Delta \omega = \omega_2 - \omega_1 = \frac{R}{L}
+	\label{bandwidth}
+\end{equation}
+
+\subsection{Deriving the Q-factor}
+The Q-factor of a LCR filter characterizes the sharpness of the filter, with high Q-factor corresponding to a sharp and narrow filter response and low Q-factor corresponding to a broad filter response. The Q-factor is defined to be the ratio between the resonant frequency $\omega_0$ and the 3dB bandwidth $\Delta \omega$.
+
+From Equation (\ref{resonance}) and (\ref{bandwidth}),
+\begin{equation}
+	Q = \frac{\omega_0}{\Delta \omega} = \frac{1}{R} \sqrt{\frac{L}{C}}
+	\label{qfactor}
+\end{equation}
+
+\section{Procedure}
+Through this experiment, a basic LCR circuit is observed and the frequency response of the circuit is plotted. The circuit that is being investigated has $L=2.2mH$ and $C=100nF$, where L is the inductance of the series inductor and C is the capacitance of the series capacitor. The frequency response is also observed for 2 values of $R$, $51 \Omega$ and $100 \Omega$.
+\subsection{Required Equipment}
+\begin{itemize}
+	\item Function Generator (capable of 10Hz-1Mhz range)
+	\item Oscilloscope (at least 2 channels)
+	\item Oscilloscope Probes (x2)
+	\item Multimeter with resistance measurement functionality
+	\item Multimeter probes
+	\item Coaxial Cables
+	\item BNC splitter
+\end{itemize}
+
+\subsection{Circuit Construction}
+The test circuit can be constructed as shown in Figure \ref{fig:wireup}. An SPDT switch is used so that the circuit can be switched between the $51\Omega$ and $100\Omega$ resistors. The output voltage straight from the signal generator is sampled on CH1 of the oscilloscope and the voltage across the resistor is sampled on CH2. Sampling both of these signals at the same time, enables comparison between the waveforms to understand the behaviour of the resonance circuit.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{wireup}
+	\caption{Test circuit diagram}
+	\label{fig:wireup}
+\end{figure}
+
+\subsection{Measured parameters}
+First, measure the actual resistances of the resistors $R1$ and $R2$. With these values, it is possible to avoid errors due to the tolerances of the resistors.
+
+Next, configure the oscilloscope such that the following parameters are displayed on the screen.
+\begin{itemize}
+	\item Amplitude (CH1) measuring $V_{in}$
+	\item Amplitude (CH2) measuring $V_{out}$
+	\item Phase Difference between CH1 and CH2 measuring $\Delta \phi$
+\end{itemize}
+
+Then configure the signal generator to pass in a $5V_{pp}$ input sinusoidal signal corresponding to $V_{in}$. Consider different values of $\omega$ to measure, and for every value of $\omega$ considered, record $V_{in}$, $V_{out}$ and $\Delta \phi$ in a table.
+
+\subsection{Choosing sample values for $\omega$}
+It is important to efficiently choose sample values for $\omega$ such that more samples are collected around points of interest, namely the resonance frequency. For the provided values of L and C, the predicted resonant frequency can be calculated according to Equation (\ref{resonance}) which is $\omega_0 = 67420rad/s \implies f = 10730Hz$.
+
+Outside of this resonant frequency, beyond the 3dB cutoff, a constant rolloff is expected, and therefore not many measurements need to be taken in that region.
+
+\section{Results and Discussion}
+
+\section{Conclusion}
+
+
+\end{document}  
