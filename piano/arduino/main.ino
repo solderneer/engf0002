@@ -50,7 +50,6 @@ void loop() {
   // First check and play any input data
   if(Serial.available() > 0) {
     Serial.readBytesUntil('\n', a_buffer, 4);
-    // uint32_t freq = ((uint32_t)a_buffer[0] << 24) | ((uint32_t)a_buffer[1] << 16) | ((uint32_t)a_buffer[2] << 8) | (uint32_t)a_buffer[3];
     uint32_t freq = bufferToUInt32(a_buffer);
     Serial.print(freq);
     tone(BUZZER, freq, 1000); 
