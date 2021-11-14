@@ -14,6 +14,7 @@
   #include <sys/types.h>
   #include <sys/stat.h>
   #include <errno.h>
+  #include <sys/ioctl.h>
 #endif
 
 // Function defs
@@ -101,7 +102,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (frequency != -1) {
-      char data[4] = {frequency, frequency >> 8, frequency >> 16, frequency >> 24};
+      char data[4] = {frequency >> 24, frequency >> 16, frequency >> 8, frequency};
       int n = write_port(port, data, 4);
       if (n != 4) {
         printf("Error writing data to the Arduino.\n");
@@ -134,7 +135,7 @@ int find_ports(char names[][32]) { // Linux needs longer names
     int n = 0;
 
     regex_t reg;
-    if (regcomp(&reg, "tty\.*", REG_EXTENDED|REG_NOSUB) != 0) 
+    if (regcomp(&reg, "tty\\.[a-zA-Z]+", REG_EXTENDED|REG_NOSUB) != 0) 
       return 0;
 
     if (dir != NULL) {
@@ -149,7 +150,7 @@ int find_ports(char names[][32]) { // Linux needs longer names
         struct stat file_stat;
         stat(ent->d_name, &file_stat);
        
-        if(!regexec(&reg, ent->d_name, 0, NULL, 0)) {
+        if(regexec(&reg, ent->d_name, 0, NULL, 0) == 0) {
           strncpy(names[n], ent->d_name, 32);
           n++;
         }
@@ -238,77 +239,87 @@ char getch() {
 int open_serial_port(const char *device, uint32_t baud_rate) {
   // Add back the /dev
   char path[80];
-
   sprintf(path, "/dev/%s", device);
-  printf("%s", path);
-  int fd = open(path, O_RDWR | O_NOCTTY | O_NDELAY);
+  int fd = open(path, O_RDWR | O_NONBLOCK);
   if (fd == -1) {
-    printf("pew");
     return -1;
   }
+  
+  // Some strange phenomenon where arduino resets on every command
+  // Disabling DTR
+  // int status;
+  // ioctl(fd, TIOCMGET, &status);
+  // status &= ~TIOCM_DTR;
+  // ioctl(fd, TIOCMSET, &status);
 
-  int result = tcflush(fd, TCIOFLUSH);
 
   // Get the current configuration of the serial port.
   struct termios options;
-  result = tcgetattr(fd, &options);
+  int result = tcgetattr(fd, &options);
   if (result != 0) {
     close(fd);
     return -1;
   }
 
-  // Turn off any options that might interfere with our ability to send and receive raw binary bytes.
-  options.c_iflag = 0;
-  options.c_oflag = 0;
-  options.c_lflag = 0;
-  options.c_cflag = 0;
-
-  // Set up timeouts: Calls to read() will return as soon as there is at least one byte available or when 100 ms has passed.
-  options.c_cc[VTIME] = 0;
-  options.c_cc[VMIN] = 0;
+  // Selecting baud rate
+  speed_t brate;
+  switch(baud_rate) {
+    case 4800:
+      brate = B4800;
+      break;
+    case 9600:
+      brate = B9600;
+      break;
+    case 19200:
+      brate = B19200;
+      break;
+    case 38400:
+      brate = B38400;
+      break;
+    case 57600:
+      brate = B57600;
+      break;
+    case 115200:
+      brate = B115200;
+      break;
+    default:
+      printf("\nUsing default baud rate of 9600");
+      brate = B9600;
+  }
   
-  options.c_cflag = B9600 | CS8 | CREAD;
+  cfsetospeed(&options, brate);
+  cfsetispeed(&options, brate);
 
-  // cfsetospeed(&options, B9600);
-  // cfsetispeed(&options, cfgetospeed(&options));
+  // Configuring 8N1
+  options.c_cflag &= ~PARENB;
+  options.c_cflag &= ~CSTOPB;
+  options.c_cflag &= ~CSIZE;
+  options.c_cflag |= CS8;
 
-  result = tcsetattr(fd, TCSANOW, &options);
-  if (result) {
+  // No flow control
+  options.c_cflag &= ~CRTSCTS;
+
+  options.c_cflag |= CREAD | CLOCAL;  // turn on READ & ignore ctrl lines
+  options.c_iflag &= ~(IXON | IXOFF | IXANY); // turn off s/w flow ctrl
+
+  options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG); // make raw
+  options.c_oflag &= ~OPOST; // make raw
+
+  options.c_cc[VMIN]  = 0;
+  options.c_cc[VTIME] = 0;
+
+  tcsetattr(fd, TCSANOW, &options);
+  
+  if (tcsetattr(fd, TCSAFLUSH, &options) < 0) {
     close(fd);
     return -1;
   }
-
-  char* str = "Hello";
-
-  /* Attempt to send and receive
-  printf("Sending: %s\n", str);
-
-  int wcount = write(fd, &str, strlen(str));
-  if (wcount < 0) {
-      perror("Write");
-      return -1;
-  }
-  else {
-      printf("Sent %d characters\n", wcount);
-  }*/
 
   return fd;
 }
 
 int write_port(int fd, char *buf, size_t n) {
-  printf("\n%d", buf[0]);
-  printf("%d", buf[1]);
-  printf("%d", buf[2]);
-  printf("%d\n", buf[3]);
-
-  int result = tcflush(fd, TCIOFLUSH);
-  
-  char* str = "Hello";
-  ssize_t wn = write(fd, &str, strlen(str));
-  perror("stuff");
-
-  printf("%d", errno);
-  printf("%ld", wn);
+  ssize_t wn = write(fd, buf, 4);
   return wn;
 }
 
