@@ -1,5 +1,6 @@
 \documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
 \usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
+\usepackage{natbib}
 \geometry{a4paper}                   		% ... or a4paper or a5paper or ... 
 %\geometry{landscape}                		% Activate for rotated page geometry
 %\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
@@ -24,14 +25,22 @@
 %\subsection{}
 
 \section{Introduction}
+Capacitors and inductors form the basis for all electronics - both in the analog and the digital realm. These reactive components have enabled engineers to work with all sorts of time-varying signals which has many applications in signal processing, radio communication and even power electronics through devices such like buck-boost converters. In this report we will be looking into a specific characteristic of a series circuit with a capacitor, inductor and resistor (otherwise known as a LCR circuit) called resonance. Resonance enables engineers to build band-pass and band-stop filters which are very useful for extracting a narrow frequency band of signals into a circuit. The aims of this experiment are to,
+
+\begin{enumerate}
+	\item Characterize the transfer function of LCR circuits
+	\item Determine how the series resistance affects the frequency response of the circuit
+	\item Determine how the phase difference of the waveform is altered by the circuit
+\end{enumerate}
+
 \section{Theory}
-Resonance is a phenomenon that occurs in circuits with both capacitive and inductive components. This effect arises due to the fact that capacitive impedance decreases as the frequency increases, as compared to inductive impedance which increases as the frequency increases. Additionally, capacitors have a phase shift of -90$^{\circ}$ while inductors have a phase shift of -90$^{\circ}$. The equations for the impedances of capacitors and inductors are $Z_C$ and $Z_I$ correspondingly, and are shown below.
+Resonance is a phenomenon that occurs in circuits with both capacitive and inductive components. This effect arises due to the fact that capacitive impedance decreases as the frequency increases, as compared to inductive impedance which increases as the frequency increases. Additionally, capacitors have a phase shift of -90$^{\circ}$ while inductors have a phase shift of -90$^{\circ}$. The equations for the impedances of capacitors and inductors are $Z_C$ and $Z_I$ correspondingly, and are shown below \citep{mchutchon_2013}.
 
 \begin{equation}
 	\nonumber Z_C = \frac{-j}{\omega C},\ Z_I = j\omega C.
 \end{equation}
 
-Together, the combined effect of a series LCR circuit is that, at some frequency $\omega_0$, the impedances from the capacitor and inductor will cancel each other out, which results in a purely real impedance (from the resistor with resistance $R$) and no phase shift. This frequency is known as the resonance frequency of the circuit.
+Together, the combined effect of a series LCR circuit is that, at some frequency $\omega_0$, the impedances from the capacitor and inductor will cancel each other out, which results in a purely real impedance (from the resistor with resistance $R$) and no phase shift. This frequency is known as the resonance frequency of the circuit \citep{mchutchon_2013}.
 
 \begin{figure}[h]
 	\centering
@@ -58,9 +67,6 @@ Which means that the resonance frequency $\omega_0$ is,
 	\omega_0 = \frac{1}{\sqrt{LC}}
 	\label{resonance}
 \end{equation}
-
-\subsection{Expected frequency response}
-
 
 \subsection{Deriving the 3dB bandwidth}
 The 3dB bandwidth is obtained from the range of values for which $\big |\frac{V_out}{V_in} \big| = \frac{1}{\sqrt{2}}$. The 3dB bandwidth is an important characteristic as it shows us the range of frequencies for which the signal not attenuated more than half-power. To derive the 3dB bandwidth, we start with Equation (\ref{transfer})
@@ -127,8 +133,106 @@ It is important to efficiently choose sample values for $\omega$ such that more 
 Outside of this resonant frequency, beyond the 3dB cutoff, a constant rolloff is expected, and therefore not many measurements need to be taken in that region.
 
 \section{Results and Discussion}
+First, the measured resistances of the resistors is given in Table \ref{resistance}.
+
+\begin{table}[h!]
+  \begin{center}
+    \caption{Measured Resistances}
+    \label{tab:resistance}
+    \begin{tabular}{l | c | r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      \textbf{Resistor} & \textbf{Expected} & \textbf{Measured}\\
+      \hline
+      R1 & $51\Omega$ & $51.862\Omega$ \\
+      R2 & $100\Omega$ & $113.347\Omega$ \\
+    \end{tabular}
+  \end{center}
+\end{table}
+
+
+The collected data also has to be transformed such that the ratio $\frac{V_{out}}{V_{in}}$ is expressed in dB using Equation (\ref{dB}).
+
+\begin{equation}
+	dB = 20\log{\frac{V_{out}}{V_{in}}}
+	\label{dB}
+\end{equation}
+
+Then, plotting the obtained values for the $51\Omega$ and $100\Omega$ against frequency (on a logarithmic scale), yields the transfer function for both resistors as shown Figure \ref{fig:transfer}.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{transfer}
+	\caption{Transfer Function of LCR circuit for $R=51\Omega$ and $R=100\Omega$}
+	\label{fig:transfer}
+\end{figure}
+
+\subsection{Resonant frequency analysis}
+The first observation that is made is the noticeable peak at $f \approx 10700Hz$. That corresponds to our theoretical resonance frequency of $10730Hz$. It is also clear from the graph that the change in resistor value between $51\Omega$ and $100\Omega$ does not impact the resonant frequency as predicted by the resonance frequency equation in Equation (\ref{resonance}). The transfer function depicted shows the characteristics of a bandpass filter, where only a certain range of frequencies (between the 3dB cutoff frequencies) are not extremely attenuated.
+
+\subsection{Q-factor and 3dB cutoff analysis}
+The second observation is that the graph for $R=51\Omega$ is noticeably narrower than the graph for $R=100\Omega$. This is a confirmation of the prediction by Equation (\ref{qfactor}), as the Q-factor is lower when the series resistance in the LCR circuit is greater. 
+
+The 3dB cutoff point is labelled by the grey horizontal line in the graph. As predicted by Equation (\ref{bandwidth}), the bandwidth with the $100\Omega$ resistor is wider as shown by the fact that more of the blue graph is above the line compared to the red graph.
+
+Reading from Figure \ref{fig:transfer-focus}, we can estimate the following values for the bandwidth and Q-factors of the $100\Omega$ and $51\Omega$ resistors using Equation (\ref{bandwidth}) and Equation (\ref{qfactor}).
+
+\begin{gather}
+	\nonumber \Delta \omega_{51\Omega} = 11.6kHz - 9.64kHz = 1.96kHz \implies Q_{51\Omega} = 10.7kHz/1.96kHz = 5.45 \\
+	\nonumber \Delta \omega_{100\Omega} = 12.98kHz - 8.44kHz = 4.54kHz \implies Q_{100\Omega} = 10.7kHz/4.54kHz = 2.37
+\end{gather}
+
+Reading from Figure (\ref{fig:transfer}), it is also visible that the slope of the graph well beyond the 3dB cutoff point is $\approx 25dB/decade$.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{transfer-focus}
+	\caption{Transfer function zoomed in around the resonance frequency ($\omega_0$)}
+	\label{fig:transfer-focus}
+\end{figure}
+
+\subsection{Change in $V_{in}$ with frequency}
+An interesting observation would be that $V_{in}$ fluctuates along with the frequency.
+
+\begin{table}[h!]
+  \begin{center}
+    \caption{$V_{in}$ changing with Frequency ($51\Omega$ Resistor)}
+    \label{tab:vin}
+    \begin{tabular}{l | r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      \textbf{Frequency} & \textbf{$V_{in}$}\\
+      \hline
+      1kHz & 5.18V \\
+      10kHz & 3.00V \\
+      100kHz & 5.12V \\
+    \end{tabular}
+  \end{center}
+\end{table}
+
+In fact, the $V_in$ is observed to drop significantly in the region around the resonance frequency of 10kHz. A proposed explanation for this is that, as the frequency approaches resonance, the impedance from the inductor and capacitor cancel out, leaving a low series resistance of just $51\Omega$. This low resistance, could be loading the output of the signal generator, causing the generated signal voltage to sag.
+
+\subsection{Investigating phase around resonance}
+One consequence of the inductive and capacitive properties of the circuit, is that the circuit imposes a phase shift of $\Delta \phi$ on the waveform passing through it. However, the reactive components of the circuit cancel out during resonance, thus the phase shift must approach zero as the frequency approaches the resonant frequency. 
+
+The phase shift around resonance is plotted using linear regression in Figure \ref{fig:phase}. The $R^2$ value from the linear regression is 0.9921, which is high and indicates that the regression model fits the data well. As expected from the theory, as the frequency increases towards the resonance frequency, the phase difference drops from a positive value towards zero. Near the resonance frequency, $\Delta \phi = 0$. Similarly, as the frequency increases away from the resonance frequency, the phase difference continues to decrease and becomes negative.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{phase-diff}
+	\caption{Phase difference ($\Delta \phi$) around the resonance frequency ($\omega_0$)}
+	\label{fig:phase}
+\end{figure}
 
 \section{Conclusion}
+As the aims of the experiment highlighted, the transfer function of the LCR circuit has been characterized in this report. As predicted by the theory, a peak is observed at the resonant frequency and the frequencies which do not lie between the 3dB cutoff frequencies are significantly attenuated by the filter. The effect of the series resistance on the filter response has also been shown, as a higher resistance leads to a larger bandwidth and a broader curve seen in Figure \ref{fig:transfer-focus}. Lastly, the change in phase difference around the resonant frequency was analyzed in Figure \ref{fig:phase} and it was demonstrated that at resonance, the phase difference is zero.
+
+The results of this experiment enable the creation of filters which can be used in various signal processing applications, especially in radio and audio equipment. For example, AM radios use bandpass filters to select radio stations, and band stop filters could be used to remove frequencies from audio tracks to enhance the listening experience.
+
+Further analysis can be done around other interesting configurations of LC circuits such as low-pass, high-pass and band-stop filters. 
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\section{Appendix A}
+\subsection{Raw Data ($51\Omega$)}
+\subsection{Raw Data ($100\Omega$)}
+\subsection{Matlab Code Reference}
 
 
 \end{document}  

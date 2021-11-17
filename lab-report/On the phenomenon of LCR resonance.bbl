@@ -1,0 +1,14 @@
+\begin{thebibliography}{1}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[McHutchon(2013)]{mchutchon_2013}
+Andrew McHutchon.
+\newblock \emph{RLC Resonant Circuits}.
+\newblock Cambridge University, 2013.
+\newblock URL \url{http://mlg.eng.cam.ac.uk/mchutchon/ResonantCircuits.pdf}.
+
+\end{thebibliography}
